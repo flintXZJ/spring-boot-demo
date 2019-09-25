@@ -1,0 +1,14 @@
+# main server properties
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: spring-boot-demo-web
+  freemarker:
+    cache: false # 浏览器缓存，开发阶段应设为false，应为经常会修改
+    charset: utf-8 # 字符集
+    suffix: .html # 模板后缀名,不设置的情况下默认为ftl
+    template-loader-path: classpath:/templates/ # 模板加载路径
