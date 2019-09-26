@@ -30,11 +30,6 @@ public class WebRequestLogAspect {
     public void webLog() {
     }
 
-    /**
-     *
-     *
-     *
-     */
     @Around("webLog()")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         // 接收到请求，记录请求内容
