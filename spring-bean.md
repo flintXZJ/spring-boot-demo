@@ -22,8 +22,9 @@
 public class IndexController {}
  ```
 
+
 | 作用域 | 使用 | 描述 |
-|---|---|---|  
+| --- | --- | --- |
 | singleton | @Scope("singleton") | IoC 容器（ApplicationContext）范围单例 |  
 | prototype | @Scope("prototype") | 每次获取该 Bean 都会 new 一个新的对象返回 |  
 | request | @Scope("request") 或 @RequestScope | 单次 HTTP 请求范围单例 |  

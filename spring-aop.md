@@ -103,10 +103,10 @@ spring aop 支持的切入点指示器：
 
 通知类型执行顺序：  
 正常情况：  
-![](https://upload-images.jianshu.io/upload_images/12170632-2931198a9b094f45.jpeg?imageMogr2/auto-orient/strip|imageView2/2/format/webp)  
+![image](https://wx2.sinaimg.cn/large/005UybFhly1g7vhcnij0ij30ym0o6jxf.jpg)  
 
 多个切面的情况下，可以通过@Order指定先后顺序，数字越小，优先级越高。  
-![](https://upload-images.jianshu.io/upload_images/12170632-67b89b71dc0cb8ac.jpeg?imageMogr2/auto-orient/strip|imageView2/2/format/webp)
+![image](https://wx1.sinaimg.cn/large/005UybFhly1g7vhd6bkddj31es0netil.jpg)
 
 
 ##### 目标对象(Target object)
