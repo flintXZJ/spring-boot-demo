@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -26,6 +25,25 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * 但是，这个RedisTemplate的泛型是<Object,Object>，写代码不方便，需要写好多类型转换的代码；我们需要一个泛型为<String,Object>形式的RedisTemplate
  * <p>
  * 参考源码：RedisAutoConfiguration
+ *
+ * spring-data-redis中序列化类有以下几个：
+ * 1、GenericToStringSerializer：可以将任何对象泛化为字符创并序列化
+ * 2、Jackson2JsonRedisSerializer：序列化Object对象为json字符创（与JacksonJsonRedisSerializer相同）
+ * 3、JdkSerializationRedisSerializer：序列化java对象
+ * 4、StringRedisSerializer：简单的字符串序列化
+ *
+ * JdkSerializationRedisSerializer序列化
+ * 被序列化对象必须实现Serializable接口，被序列化除属性内容还有其他内容，长度长且不易阅读
+ * 存储内容如下：
+ * "\xac\xed\x00\x05sr\x00!com.oreilly.springdata.redis.User\xb1\x1c \n\xcd\xed%\xd8\x02\x00\x02I\x00\x03ageL\x00\buserNamet\x00\x12Ljava/lang/String;xp\x00\x00\x00\x14t\x00\x05user1"
+ *
+ * JacksonJsonRedisSerializer序列化
+ * 被序列化对象不需要实现Serializable接口，被序列化的结果清晰，容易阅读，而且存储字节少，速度快
+ * 存储内容如下：
+ * "{\"userName\":\"user1\",\"age\":20}"
+ *
+ * StringRedisSerializer序列化
+ * 一般如果key、value都是string字符串的话，就是用这个就可以了
  *
  * @author zhijunxie
  * @date 2019/7/9 14:34
@@ -64,7 +82,8 @@ public class RedisConfig {
         // hash的key也采用StringRedisSerializer的序列化方式
         template.setHashKeySerializer(stringRedisSerializer);
 
-        // value序列化方式采用jackson
+        // value序列化方式采用jackson，由JdkSerializationRedisSerializer更换为Jackson2JsonRedisSerializer
+        //此种序列化方式结果清晰、容易阅读、存储字节少、速度快，所以推荐更换
         template.setValueSerializer(jackson2JsonRedisSerializer);
         // hash的value序列化方式采用jackson
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
@@ -76,7 +95,7 @@ public class RedisConfig {
      * 配置使用注解的时候缓存配置，默认是序列化反序列化的形式，加上此配置则为 json 形式
      */
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory factory) {
+    public CacheManager cacheManager(LettuceConnectionFactory factory) {
         // 配置序列化
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
         RedisCacheConfiguration redisCacheConfiguration = config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))

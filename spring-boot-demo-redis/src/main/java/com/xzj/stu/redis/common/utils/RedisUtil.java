@@ -1,6 +1,7 @@
 package com.xzj.stu.redis.common.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -589,5 +590,35 @@ public final class RedisUtil {
         }
         redisTemplate.opsForValue().getOperations().expire(redisKey, 60, TimeUnit.SECONDS);
         return setResult;
+    }
+
+    /**
+     * 管道操作
+     *
+     * @param map
+     * @return
+     */
+    public List<Object> pipelinedSet(Map<String, String> map) {
+        List<Object> list = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                connection.set(entry.getKey().getBytes(), entry.getValue().getBytes());
+            }
+//            map.forEach((key, value) -> {
+//                connection.set(key.getBytes(), value.getBytes());
+//            });
+            return null;
+        });
+
+        return list;
+    }
+
+    /**
+     * 向通道发送消息
+     *
+     * @param channel
+     * @param message
+     */
+    public void convertAndSend(String channel, String message) {
+        redisTemplate.convertAndSend(channel, message);
     }
 }

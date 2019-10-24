@@ -13,7 +13,7 @@ spring:
     port: 6379
     database: 0
     password:
-    timeout: 1000ms
+    timeout: 5000ms
 #  redis集群
 #    cluster:
 #      nodes:
