@@ -593,6 +593,83 @@ public final class RedisUtil {
     }
 
     /**
+     * 不存在,set成功, return true;
+     * 已经存在, return false
+     *
+     * 更安全的分布式锁实现方法。
+     *
+     *
+     * @param redisKey
+     * @param randomValue 这个值在所有的客户端必须是唯一的，所有同一key的获取者（竞争者）这个值都不能一样。value的值必须是随机数主要是为了更安全的释放锁
+     * @return
+     */
+    public boolean setLock(String redisKey, String randomValue) {
+        Boolean setResult = redisTemplate.opsForValue().setIfAbsent(redisKey, randomValue);
+        if (!setResult) {
+            return setResult;
+        }
+        redisTemplate.opsForValue().getOperations().expire(redisKey, 60, TimeUnit.SECONDS);
+        return setResult;
+    }
+
+    /**
+     * 释放锁
+     *
+     * 使用这种方式释放锁可以避免删除别的客户端获取成功的锁。
+     * 举个例子：客户端A取得资源锁，但是紧接着被一个其他操作阻塞了，当客户端A运行完毕其他操作后要释放锁时，原来的锁早已超时并且被Redis自动释放，
+     * 并且在这期间资源锁又被客户端B再次获取到。
+     *
+     * 如果仅使用DEL命令将key删除，那么这种情况就会把客户端B的锁给删除掉。
+     *
+     * @param redisKey
+     * @param randomValue
+     * @return
+     */
+    public boolean unLock(String redisKey, String randomValue) {
+        if (randomValue.equals(get(redisKey))) {
+            del(redisKey);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 不存在,set成功, return true;
+     * 已经存在, return false
+     *
+     * @param redisKey
+     * @param expire
+     * @return
+     */
+    public boolean setLock(String redisKey, Long expire) {
+        Boolean setResult = redisTemplate.opsForValue().setIfAbsent(redisKey, "");
+        if (!setResult) {
+            return setResult;
+        }
+        redisTemplate.opsForValue().getOperations().expire(redisKey, expire, TimeUnit.SECONDS);
+        return setResult;
+    }
+
+    /**
+     * 不存在,set成功, return true;
+     * 已经存在, return false
+     *
+     * @param redisKey
+     * @param expire
+     * @param timeUnit
+     * @return
+     */
+    public boolean setLock(String redisKey, Long expire, TimeUnit timeUnit) {
+        Boolean setResult = redisTemplate.opsForValue().setIfAbsent(redisKey, "");
+        if (!setResult) {
+            return setResult;
+        }
+        redisTemplate.opsForValue().getOperations().expire(redisKey, expire, timeUnit);
+        return setResult;
+    }
+
+    /**
      * 管道操作
      *
      * @param map
