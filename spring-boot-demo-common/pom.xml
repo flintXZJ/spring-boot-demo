@@ -8,7 +8,7 @@
     <name>spring-boot-demo-common</name>
 
     <properties>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <fastjson.version>1.2.72</fastjson.version>
     </properties>
 
